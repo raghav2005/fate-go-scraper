@@ -62,15 +62,21 @@ for tier_table in tier_tables:
             char_NP_QAB = get_QAB_from_HTML_class(char_tier_np_info.get("class"))
 
             char_summary = tier_entry.find("div", {"class": "tier-expl-container"}).get_text()
-            
+
+            char_urls = tier_entry.find("div", {"class": "FGOTierServantIcon"})
+            char_page_url = char_urls.find("a").get("href").split('/')[-1]
+            char_img_url = char_urls.find("img").get("src")
+
             chars_in_tier[tier].append({
                 "name": char_name,
                 "rarity": char_rarity,
                 "summary": char_summary,
                 "type": char_type,
-                "NP_QAB": char_NP_QAB
+                "NP_QAB": char_NP_QAB,
+                "img_url": char_img_url,
+                "servant_page_partial_url": char_page_url
             })
-            
+
     except Exception as e:
         logger.error(e)
 
