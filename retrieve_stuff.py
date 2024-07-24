@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from loguru import logger
+from collections import defaultdict
 
 # setup chrome options
 chrome_options = Options()
@@ -25,6 +26,13 @@ url = "https://fgo.gamepress.gg/servant-tier-list"
 driver.get(url)
 logger.success(f"requested webpage: {url}")
 
+def get_QAB_from_HTML_class(list_of_HTML_classes):
+    for HTML_class in list_of_HTML_classes:
+        if "npinfobox" in HTML_class:
+            return HTML_class.split('-')[1][0].upper()
+
+    return "Unknown"
+
 try:
     # wait until the desired element is present
     WebDriverWait(driver, 10).until(
@@ -38,32 +46,35 @@ except Exception as e:
     logger.error(e)
 
 tier_tables = soup.find_all("table", {"class": "fgo-tier-table"})
-chars_in_tier = {}
+chars_in_tier = defaultdict(list)
 
 for tier_table in tier_tables:
     tier = tier_table.find("tr").find_all('th')[0].get_text()
     print(f"tier: {tier}")
 
     try:
-        counter = 0
         for tier_entry in tier_table.find("td"):
             char_name = tier_entry.find("span", {"class": "tier-servant-name-span"}).get_text()
 
-            if counter == 0:
-                chars_in_tier[tier] = [char_name]
-                counter += 1
+            char_tier_np_info = tier_entry.find("div", {"class": "FGOTierNPInfo"})
+            char_rarity = len(char_tier_np_info.find("span", {"class": "star-rarity"}).get_text())
+            char_type = char_tier_np_info.find("div").get_text()
+            char_NP_QAB = get_QAB_from_HTML_class(char_tier_np_info.get("class"))
 
-            else:
-                chars_in_tier[tier] += [char_name]
-
-            print(tier_entry)
+            char_summary = tier_entry.find("div", {"class": "tier-expl-container"}).get_text()
+            
+            chars_in_tier[tier].append({
+                "name": char_name,
+                "rarity": char_rarity,
+                "summary": char_summary,
+                "type": char_type,
+                "NP_QAB": char_NP_QAB
+            })
             
     except Exception as e:
         logger.error(e)
 
 print(chars_in_tier)
-print(len(chars_in_tier.values()))
 
 # close the webdriver instance
 driver.quit()
-
