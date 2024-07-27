@@ -13,8 +13,7 @@ class FGOWebRetriever(WebRetriever):
         super().__init__(url, debug)
         self.chars_in_tier = self.get_tier_list_info()
 
-    @staticmethod
-    def get_QAB_from_HTML_class(list_of_HTML_classes):
+    def get_QAB_from_HTML_class(self, list_of_HTML_classes):
         for HTML_class in list_of_HTML_classes:
             if "npinfobox" in HTML_class:
                 return HTML_class.split("-")[1][0].upper()
