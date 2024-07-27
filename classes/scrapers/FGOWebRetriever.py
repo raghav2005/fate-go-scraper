@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 from collections import defaultdict
 
+
 class FGOWebRetriever(WebRetriever):
     def __init__(self, url, debug=False):
         super().__init__(url, debug)
