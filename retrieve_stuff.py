@@ -16,6 +16,7 @@ class WebRetriever:
     def __init__(self, url, debug=False):
         self.url = url
         self.debug = debug
+        self.driver = None
 
     def setup_selenium_driver(self):
         # setup chrome options for selenium
@@ -78,7 +79,8 @@ class FGOWebRetriever(WebRetriever):
         super().__init__(url, debug)
         self.chars_in_tier = self.get_tier_list_info()
 
-    def get_QAB_from_HTML_class(self, list_of_HTML_classes):
+    @staticmethod
+    def get_QAB_from_HTML_class(list_of_HTML_classes):
         for HTML_class in list_of_HTML_classes:
             if "npinfobox" in HTML_class:
                 return HTML_class.split("-")[1][0].upper()
@@ -151,13 +153,14 @@ class FGOWebRetriever(WebRetriever):
                     except Exception as e:
                         self.log(f"Error processing entry: {e}", "error")
 
-            self.quit_webdriver()
             return chars_in_tier
 
         except Exception as e:
             self.log(f"Error retrieving tier list info: {e}", "error")
-            self.quit_webdriver()
             return defaultdict(list)
+
+        finally:
+            self.quit_webdriver()
 
 
 if __name__ == "__main__":
