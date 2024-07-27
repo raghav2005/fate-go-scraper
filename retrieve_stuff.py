@@ -92,7 +92,8 @@ class FGOWebRetriever(WebRetriever):
         try:
             # wait until content is present
             WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located((By.CLASS_NAME, "view-content"))
+                # EC.presence_of_element_located((By.CLASS_NAME, "view-content"))
+                EC.presence_of_element_located((By.CLASS_NAME, "fgo-tier-table"))
             )
 
             self.log("webpage loaded")
